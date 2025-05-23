@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Error</title>
+    <!-- Link to external CSS stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Main heading indicating an error occurred -->
+        <h1>⚠️ Something went wrong</h1>
+
+        <!-- Button group for user actions -->
+        <div class="btn-group">
+            <!-- Link to go back to the home page for retry -->
+            <a href="{{ url_for('index') }}" class="btn">🔄 Try Again</a>
+        </div>
+    </div>
+</body>
+</html>

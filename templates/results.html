@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Website Analysis Results</title>
+    
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Inline CSS styles for the results page -->
+    <style>
+        /* Page background and base text color */
+        body {
+            background-color: #121212; /* dark background */
+            color: #e0e0e0; /* light text */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main container styling */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: #1e1e1e; /* dark container */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Headings styling */
+        h1, h2, h3 {
+            color: #ffffff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* Unordered lists */
+        ul {
+            padding-left: 20px;
+        }
+
+        /* List items spacing */
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Summary section styling */
+        .summary {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #2c2c2c;
+            border-radius: 8px;
+        }
+
+        /* Flexbox grid for images */
+        .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* Styling individual images */
+        .image-grid img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #444;
+            border-radius: 5px;
+            max-height: 200px;
+        }
+
+        /* Button container with spacing */
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Buttons style */
+        .btn {
+            background-color: #03a9f4;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        /* Button hover effect */
+        .btn:hover {
+            background-color: #0288d1;
+        }
+
+        /* Button active (pressed) effect */
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Hide buttons when printing */
+        @media print {
+            .btn-group {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Main content container -->
+<div class="container" id="report-content">
+    
+    <!-- Page title showing the analyzed website URL -->
+    <h1>Website Analysis for {{ url }}</h1>
+
+    <!-- Summary section showing trust score -->
+    <section class="summary">
+        <h2>Trust Score: {{ trust_score }}/100</h2>
+    </section>
+
+    <!-- WHOIS data section -->
+    <section>
+        <h3>WHOIS Data</h3>
+        <ul>
+            <li><strong>Domain:</strong> {{ whois_data.domain_name or "N/A" }}</li>
+            <li><strong>Registrar:</strong> {{ whois_data.registrar or "N/A" }}</li>
+            <li><strong>Creation Date:</strong> {{ whois_data.creation_date or "N/A" }}</li>
+            <li><strong>Country:</strong> {{ whois_data.country or "N/A" }}</li>
+            <li><strong>Name Servers:</strong>
+                <ul>
+                    <!-- Loop through name servers if available -->
+                    {% if whois_data.name_servers %}
+                        {% for ns in whois_data.name_servers %}
+                            <li>{{ ns }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li>N/A</li>
+                    {% endif %}
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Detected keywords section -->
+    <section>
+        <h3>Detected Keywords</h3>
+        <ul>
+            <!-- Loop through keywords or show default message -->
+            {% if keywords %}
+                {% for keyword in keywords %}
+                    <li>{{ keyword }}</li>
+                {% endfor %}
+            {% else %}
+                <li>No keywords detected.</li>
+            {% endif %}
+        </ul>
+    </section>
+
+    <!-- Suspicious images section -->
+    <section>
+        <h3>Suspicious Images</h3>
+        <div class="image-grid">
+            <!-- Loop through images or show default message -->
+            {% if images %}
+                {% for image in images %}
+                    <img src="{{ image }}" alt="Detected Image">
+                {% endfor %}
+            {% else %}
+                <p>No suspicious images found.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Buttons for scanning another site or downloading report -->
+    <div class="btn-group">
+        <a href="{{ url_for('index') }}" class="btn">Scan Another Website</a>
+        <button onclick="window.print()" class="btn">Download Report</button>
+    </div>
+</div>
+
+<!-- External scripts for PDF generation from the report -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    // Function to download the report as PDF (currently unused, can be wired to a button)
+    async function downloadReport() {
+        const { jsPDF } = window.jspdf;
+        const content = document.getElementById("report-content");
+        const buttons = document.querySelectorAll(".btn-group");
+
+        // Hide buttons during PDF capture
+        buttons.forEach(btn => btn.style.display = "none");
+
+        try {
+            // Capture content as canvas
+            const canvas = await html2canvas(content, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false
+            });
+
+            // Convert canvas to image data URL
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            // Add image to PDF and save
+            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+            pdf.save("website_analysis_report.pdf");
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            alert("An error occurred while generating the report.");
+        } finally {
+            // Restore buttons display after operation
+            buttons.forEach(btn => btn.style.display = "flex");
+        }
+    }
+</script>
+
+</body>
+</html>

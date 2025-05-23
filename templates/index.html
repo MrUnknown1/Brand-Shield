@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brand Shield - Website Analyzer</title>
+    
+    <!-- Link to external CSS stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Inline styles specific to this page -->
+    <style>
+        /* Body styling: center content with a dark gradient background */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #1c1c1c, #383838);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Container styling: translucent background with padding and rounded corners */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Main heading styles */
+        h1 {
+            margin-bottom: 20px;
+            font-size: 36px;
+            color: #00ffd5;
+        }
+
+        /* Text input field styling */
+        form input[type="text"] {
+            width: 300px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        /* Submit button styling */
+        form button {
+            padding: 12px 24px;
+            background-color: #00ffd5;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        /* Submit button hover effect */
+        form button:hover {
+            background-color: #00c8a2;
+        }
+
+        /* Loader container initially hidden */
+        .skeleton-loader {
+            margin-top: 30px;
+            display: none;
+        }
+
+        /* Skeleton loader block styling with pulse animation */
+        .skeleton {
+            background-color: #444;
+            border-radius: 8px;
+            margin: 10px auto;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Different sized skeleton blocks for visual placeholders */
+        .skeleton-header {
+            width: 60%;
+            height: 25px;
+        }
+
+        .skeleton-line {
+            width: 80%;
+            height: 18px;
+        }
+
+        .skeleton-box {
+            width: 90%;
+            height: 180px;
+        }
+
+        /* Pulse keyframes animation for skeleton loading effect */
+        @keyframes pulse {
+            0% {
+                background-color: #444;
+            }
+            50% {
+                background-color: #666;
+            }
+            100% {
+                background-color: #444;
+            }
+        }
+    </style>
+    
+    <!-- Script to toggle form and loader visibility -->
+    <script>
+        function showSkeletonLoader() {
+            // Hide the form when loading starts
+            document.getElementById('scanForm').style.display = 'none';
+            // Show the skeleton loader while processing
+            document.getElementById('loader').style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Main heading for the app -->
+        <h1>Brand Shield</h1>
+        
+        <!-- URL input form that triggers the loader on submit -->
+        <form id="scanForm" method="POST" action="/analyze" onsubmit="showSkeletonLoader()">
+            <input type="text" name="url" placeholder="Enter website URL" required>
+            <button type="submit">Analyze</button>
+        </form>
+
+        <!-- Skeleton loader shown during analysis -->
+        <div id="loader" class="skeleton-loader">
+            <div class="skeleton skeleton-header"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-box"></div>
+        </div>
+    </div>
+</body>
+</html>
