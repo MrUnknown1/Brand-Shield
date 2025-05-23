@@ -99,4 +99,4 @@ brand-shield/
 
 ## 📃 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is open source and part of my final year project.
